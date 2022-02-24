@@ -75,7 +75,7 @@ function HomePage() {
             as="form"
             onSubmit={function (event) {
               event.preventDefault();
-              roteamento.push("/chat");
+              roteamento.push(`/chat?username=${userName}`);
             }}
             styleSheet={{
               width: "100%",
