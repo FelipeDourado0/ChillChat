@@ -80,26 +80,26 @@ export default function ChatPage() {
         styleSheet={{
           display: "flex",
           flexDirection: "column",
-          flex: 1,
           boxShadow: "0 2px 10px 0 rgb(0 0 0 / 20%)",
           borderRadius: "5px",
           backgroundColor: "rgba(25, 29, 50,.98)",
           height: "100%",
-          maxWidth: "95%",
+          Width: "95vw",
           maxHeight: "95vh",
-          padding: "32px",
+          padding: "20px",
         }}
       >
         <Header />
         <Box
           styleSheet={{
             display: "flex",
-            backgroundColor: "rgb(28, 35, 60)",
+            backgroundColor: "rgba(28, 35, 60,.2)",
             flexDirection: "column",
             borderRadius: "5px",
             padding: "16px",
-            border: "2px solid",
+            border: "0.1px solid",
             borderColor: appConfig.theme.colors.neutrals["700"],
+            width: "100%",
           }}
         >
           <MessageList mensagens={listaDeMensagens} />
@@ -137,7 +137,7 @@ export default function ChatPage() {
               }}
             />
             <Button
-              label="GO!"
+              label="IR!"
               styleSheet={{
                 width: "30px",
                 height: "30px",
@@ -172,12 +172,16 @@ function Header() {
           justifyContent: "space-between",
         }}
       >
-        <Text variant="heading5">Chat</Text>
+        <Text variant="heading5">Bem-Vindo ao Chill Chat!</Text>
         <Button
           variant="tertiary"
           colorVariant="neutral"
           label="Logout"
           href="/"
+          styleSheet={{
+            color: "white",
+            backgroundColor: "rgba(0, 196, 180,.80)",
+          }}
         />
       </Box>
     </>
@@ -196,7 +200,7 @@ function MessageList(props) {
         color: appConfig.theme.colors.neutrals["000"],
         marginBottom: "16px",
         minHeight: "500px",
-        maxHeight: "600px",
+        maxHeight: "530px",
       }}
     >
       {/* logica da mensagem */}
@@ -209,6 +213,8 @@ function MessageList(props) {
               borderRadius: "5px",
               padding: "6px",
               marginBottom: "12px",
+              width: "80%",
+              boxShadow: "rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;",
               hover: {
                 backgroundColor: appConfig.theme.colors.neutrals[700],
               },
@@ -217,12 +223,13 @@ function MessageList(props) {
             <Box
               styleSheet={{
                 marginBottom: "8px",
+                alignItems: "center",
               }}
             >
               <Image
                 styleSheet={{
-                  width: "20px",
-                  height: "20px",
+                  width: "25px",
+                  height: "25px",
                   borderRadius: "50%",
                   display: "inline-block",
                   marginRight: "8px",
@@ -239,7 +246,6 @@ function MessageList(props) {
                 tag="span"
               >
                 {new Date().toLocaleDateString()}
-                {/* {mensagem.data} - {mensagem.hora}:{mensagem.minuto} */}
               </Text>
             </Box>
             {mensagem.texto}
