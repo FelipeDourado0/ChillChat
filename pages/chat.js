@@ -1,10 +1,45 @@
 import { Box, Text, TextField, Image, Button } from "@skynexui/components";
 import React from "react";
 import appConfig from "../config.json";
+import { useRouter } from "next/router";
+import { createClient } from "@supabase/supabase-js";
+
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVvb3JkeWRsamN0empjdWV0emtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NDU1NzczNTgsImV4cCI6MTk2MTE1MzM1OH0.B165MXKg9WuBj1XzwI_6fHHymY92HhN2Ae-E3PnLV5g";
+
+const SUPABASE_URL = "https://eoordydljctzjcuetzks.supabase.co";
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+function escutaMensagemEmTempoReal(adicionaMensagem) {
+  return supabaseClient
+    .from("Mensagens")
+    .on("INSERT", (respostaLive) => {
+      adicionaMensagem(respostaLive.new);
+    })
+    .subscribe();
+}
 
 export default function ChatPage() {
+  const roteamento = useRouter();
+  const usuarioLogado = roteamento.query.username;
   const [mensagem, setMensagem] = React.useState("");
   const [listaDeMensagens, setListaDeMensagens] = React.useState([]);
+
+  React.useEffect(() => {
+    supabaseClient
+      .from("Mensagens")
+      .select("*")
+      .order("id", { ascending: false })
+      .then(({ data }) => {
+        setListaDeMensagens(data);
+      });
+
+    escutaMensagemEmTempoReal((novaMensagem) => {
+      setListaDeMensagens((valorAtualLista) => {
+        return [novaMensagem, ...valorAtualLista];
+      });
+    });
+  }, []);
 
   /*
     // Usuário
@@ -20,15 +55,16 @@ export default function ChatPage() {
 
   function handleNovaMensagem(novaMensagem) {
     const mensagem = {
-      id: listaDeMensagens.length + 1,
-      de: "felipe",
+      de: usuarioLogado,
       texto: novaMensagem,
-      data: `${new Date().toLocaleDateString()}`,
-      hora: `${new Date().getHours()}`,
-      minuto: `${new Date().getMinutes()}`,
     };
-    setListaDeMensagens([mensagem, ...listaDeMensagens]);
-    setMensagem("");
+
+    supabaseClient
+      .from("Mensagens")
+      .insert([mensagem])
+      .then(({ data }) => {
+        setMensagem("");
+      });
   }
 
   return (
@@ -44,36 +80,29 @@ export default function ChatPage() {
         styleSheet={{
           display: "flex",
           flexDirection: "column",
-          flex: 1,
           boxShadow: "0 2px 10px 0 rgb(0 0 0 / 20%)",
           borderRadius: "5px",
-          backgroundColor: "rgba(33, 41, 49,.94)",
+          backgroundColor: "rgba(25, 29, 50,.98)",
           height: "100%",
-          maxWidth: "95%",
+          Width: "95vw",
           maxHeight: "95vh",
-          padding: "32px",
+          padding: "20px",
         }}
       >
         <Header />
         <Box
           styleSheet={{
             display: "flex",
-            backgroundColor: appConfig.theme.colors.neutrals[600],
+            backgroundColor: "rgba(28, 35, 60,.2)",
             flexDirection: "column",
             borderRadius: "5px",
             padding: "16px",
-            border: "2px solid",
+            border: "0.1px solid",
             borderColor: appConfig.theme.colors.neutrals["700"],
+            width: "100%",
           }}
         >
           <MessageList mensagens={listaDeMensagens} />
-          {/* {listaDeMensagens.map((msg) => {
-            return (
-              <li key={msg.id}>
-                {msg.de}: {msg.texto}
-              </li>
-            );
-          })} */}
           <Box
             as="form"
             styleSheet={{
@@ -101,25 +130,29 @@ export default function ChatPage() {
                 resize: "none",
                 borderRadius: "5px",
                 padding: "6px 8px",
-                backgroundColor: appConfig.theme.colors.neutrals[800],
+                backgroundColor: "white",
                 marginRight: "12px",
-                color: appConfig.theme.colors.neutrals[200],
+                color: "black",
+                fontSize: "1.1rem",
               }}
             />
             <Button
+              label="IR!"
               styleSheet={{
-                width: "20px",
-                height: "20px",
+                width: "30px",
+                height: "30px",
                 color: "black",
+                backgroundColor: "rgb(9, 999, 130)",
+                hover: {
+                  backgroundColor: "green",
+                },
               }}
               disabled={mensagem === "" ? true : false}
               onClick={(event) => {
                 event.preventDefault();
                 handleNovaMensagem(mensagem);
               }}
-            >
-              Evniar
-            </Button>
+            ></Button>
           </Box>
         </Box>
       </Box>
@@ -139,12 +172,16 @@ function Header() {
           justifyContent: "space-between",
         }}
       >
-        <Text variant="heading5">Chat</Text>
+        <Text variant="heading5">Bem-Vindo ao Chill Chat!</Text>
         <Button
           variant="tertiary"
           colorVariant="neutral"
           label="Logout"
           href="/"
+          styleSheet={{
+            color: "white",
+            backgroundColor: "rgba(0, 196, 180,.80)",
+          }}
         />
       </Box>
     </>
@@ -163,7 +200,7 @@ function MessageList(props) {
         color: appConfig.theme.colors.neutrals["000"],
         marginBottom: "16px",
         minHeight: "500px",
-        maxHeight: "600px",
+        maxHeight: "530px",
       }}
     >
       {/* logica da mensagem */}
@@ -176,6 +213,8 @@ function MessageList(props) {
               borderRadius: "5px",
               padding: "6px",
               marginBottom: "12px",
+              width: "80%",
+              boxShadow: "rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;",
               hover: {
                 backgroundColor: appConfig.theme.colors.neutrals[700],
               },
@@ -184,17 +223,18 @@ function MessageList(props) {
             <Box
               styleSheet={{
                 marginBottom: "8px",
+                alignItems: "center",
               }}
             >
               <Image
                 styleSheet={{
-                  width: "20px",
-                  height: "20px",
+                  width: "25px",
+                  height: "25px",
                   borderRadius: "50%",
                   display: "inline-block",
                   marginRight: "8px",
                 }}
-                src={`https://github.com/vanessametonini.png`}
+                src={`https://github.com/${mensagem.de}.png`}
               />
               <Text tag="strong">{mensagem.de}</Text>
               <Text
@@ -205,7 +245,7 @@ function MessageList(props) {
                 }}
                 tag="span"
               >
-                {mensagem.data} - {mensagem.hora}:{mensagem.minuto}
+                {new Date().toLocaleDateString()}
               </Text>
             </Box>
             {mensagem.texto}

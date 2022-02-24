@@ -34,7 +34,7 @@ function HomePage() {
             xs: "rgba(25, 29, 50,.98)",
           },
           maxWidth: "800px",
-          height: "300px",
+          maxHeight: "600px",
           marginRight: "auto",
           marginLeft: "auto",
           borderRadius: "15px",
@@ -42,7 +42,7 @@ function HomePage() {
           color: "white",
           padding: "25px",
           display: "flex",
-          flexDirection: "row",
+          flexDirection: { xs: "column", sm: "row" },
           alignItems: "center",
           justifyContent: "space-around",
         }}
@@ -64,7 +64,7 @@ function HomePage() {
               alignItems: "center",
             }}
           >
-            <Title tag="h1">Bem Vindos de Volta!</Title>
+            <Title tag="h2">Bem Vindos de Volta!</Title>
             <Text tag="p" variant="body1">
               Chat - Imersão Alura
             </Text>
@@ -75,7 +75,7 @@ function HomePage() {
             as="form"
             onSubmit={function (event) {
               event.preventDefault();
-              roteamento.push("/chat");
+              roteamento.push(`/chat?username=${userName}`);
             }}
             styleSheet={{
               width: "100%",
@@ -140,8 +140,8 @@ function HomePage() {
               width: "140px",
               height: "140px",
               borderRadius: "50%",
+              border: "2px solid rgba(100, 100, 100,.2)",
               marginBottom: "10px",
-              backgroundColor: "none",
             }}
           ></Image>
           <Title tag="span" BgColor="rgba(100, 100, 100,.2)">
